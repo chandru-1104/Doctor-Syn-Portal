@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Portal</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-image: url("Free Photo _ Blur hospital.jpg");
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .nav-tabs {
+            margin-bottom: 20px;
+        }
+
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        #loginTab,
+        #appointmentTab,
+        #messengerTab {
+            cursor: pointer;
+        }
+
+        .activeTab {
+            font-weight: bold;
+        }
+
+        /* Additional styles for a more colorful and attractive page */
+        .container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tabs {
+            background-color: #007bff;
+            border-radius: 5px;
+        }
+
+        .nav-link {
+            color: #ffffff;
+        }
+
+        .nav-link.activeTab {
+            font-weight: bold;
+            background-color: #0056b3;
+        }
+
+        .tab-content {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #ffffff;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* ... (rest of your existing styles) ... */
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active activeTab" id="loginTab" data-toggle="tab" href="#login">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="messengerTab" data-toggle="tab" href="#messenger">Messenger</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="appointmentTab" data-toggle="tab" href="#appointment">Appointment</a>
+            </li>
+        </ul>
+    
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="login">
+                <!-- Login Form Goes Here -->
+               <!-- <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="loginned()">Login</button>
+                </form>-->
+
+                <form onsubmit="event.preventDefault(); loginned()">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+            
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+            
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+            <div class="tab-pane fade" id="messenger">
+                <div id="chat-container">
+                    <!-- Your messenger form and script go here -->
+                    <div id="chat-log">Welcome! How can I assist you today?</div>
+                <input type="text" id="message-input" onkeydown="sendMessage(event)" placeholder="Type your message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        
+            <script>
+                const serverHost = '127.0.0.1';
+                const serverPort = 8081;
+                const clientSocket = new WebSocket(`ws://${serverHost}:${serverPort}`);
+        
+                clientSocket.onmessage = function(event) {
+                    const message = event.data;
+                    appendMessage('Chatbot', message);
+                };
+                function loginned(){
+                  //  event.preventDefault(); // Prevent the default form submission
+
+                    var name = document.getElementById('username').value;
+                    var pwd = document.getElementById('password').value;
+                    if( name ==='suhaina'){
+                    alert("Sucessfully loginned!...");
+                    $('#messengerTab').tab('show');
+
+
+                }
+                else{
+                    alert("incorrect");
+                }
+            }
+           
+
+                function sendMessage(event) {
+                    if (event && event.key !== 'Enter') {
+                        return;
+                    }
+        
+                    const messageInput = document.getElementById('message-input');
+                    const message = messageInput.value.trim();
+        
+                    if (message === 'exit') {
+                        clientSocket.send(message);
+                        clientSocket.close();
+                        appendMessage('Chatbot', "Thank you for choosing the chatbot for help. Goodbye!");
+                        messageInput.disabled = true;
+                        return;
+                    }
+        
+                    if (message !== '') {
+                        appendMessage('You', message);
+                        clientSocket.send(message);
+                        messageInput.value = '';
+                    }
+                }
+        
+                function appendMessage(sender, message) {
+                    const chatLog = document.getElementById('chat-log');
+                    const messageElement = document.createElement('div');
+                    messageElement.textContent = `${sender}: ${message}`;
+                    chatLog.appendChild(messageElement);
+        
+
+                    
+                    // Do not append the default response when the user sends 'exit'
+                    if (message.toLowerCase() !== 'exit') {
+                        const response = getBotResponse(message.toLowerCase());
+                        if (response) {
+                            const botResponseElement = document.createElement('div');
+                            botResponseElement.textContent = `Chatbot: ${response}`;
+                           chatLog.appendChild(botResponseElement);
+                        }
+                        
+                    }
+        
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                }
+                
+                function getBotResponse(userMessage) {
+                    const qaPairs = {
+                        "appointment": "To schedule an appointment, please provide your name, age, gender, phone, email, and the problem you're facing.",
+                        "payment": "For payment-related queries, please contact our billing department at billing@hospital.com.",
+                        "timing": "The hospital timings are from 8:00 AM to 7:00 PM.",
+                        "weekends": "Yes, the hospital operates on weekends but only until 12:00 PM.",
+                        "pets": "No, the hospital does not cater to pets."
+                    };
+        
+                    if (userMessage in qaPairs) {
+                        return qaPairs[userMessage];
+                    } else {
+                        return "I'm sorry, I don't understand. How can I assist you?";
+                    }
+                }
+            </script>
+                 <p>Messenger Form Goes Here</p>
+                </div>
+            <div class="tab-pane fade" id="appointment">
+                <!-- Appointment Form Goes Here -->
+                <div class="container">
+                    <!-- Your appointment form and script go here -->
+                    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+                <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css">
+            
+                <style>
+                    body {
+                        background: url("Denver Health Medical Career Collaborative Internship for High School Students.jpg") center center fixed;
+                        background-size: cover;
+                        padding-top: 50px;
+                        color: #000000;
+                    }
+            
+                    h1 {
+                        color: #007bff;
+                        text-align: left;
+                    }
+            
+                    form {
+                        background-color: rgb(133, 131, 247);
+                        padding: 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        width: 300px;
+                        margin: 20px auto;
+                    }
+            
+                    label {
+                        display: block;
+                        margin-bottom: 8px;
+                        color: #000000;
+                    }
+            
+                    input[type="text"],
+                    input[type="radio"] {
+                        width: 100%;
+                        padding: 10px;
+                        margin-bottom: 15px;
+                        box-sizing: border-box;
+                        border: 1px solid rgb(255, 0, 0), 208, 206);
+                        border-radius: 4px;
+                    }
+            
+                    input[type="button"] {
+                        background-color: #ff0000;
+                        color: #000000;
+                        border: none;
+                        padding: 10px 15px;
+                        cursor: pointer;
+                        border-radius: 4px;
+                    }
+            
+                    input[type="button"]:hover {
+                        background-color: #0056b3;
+                    }
+            
+                    button {
+                        background-color: #000000;
+                        color: #ff0000;
+                        border: none;
+                        padding: 10px 15px;
+                        cursor: pointer;
+                        border-radius: 4px;
+                        margin-top: 10px;
+                    }
+            
+                    button:hover {
+                        background-color: #218838;
+                    }
+            
+                    ul {
+                        list-style: none;
+                        padding: 0;
+                        margin: 0;
+                        margin-top: 20px;
+                    }
+            
+                    li {
+                        margin-bottom: 10px;
+                        color: #6c757d;
+                    }
+            
+                    #dateTime {
+                        font-size: 18px;
+                        font-weight:bold;
+                        color: rgb(0, 0, 0)11, 11);
+                        text-align: :left;
+                        margin-bottom: 20px;
+                    }
+                </style>
+                    <!-- ... (existing appointment form and script) ... -->
+                    <h1>Doctor Appointment System</h1>
+                    <p id="dateTime"></p>
+            
+                    <form id="appointmentForm">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name"><br><br>
+                
+                        <label for="age">Age:</label>
+                        <input type="text" id="age" name="age"><br><br>
+                
+                        <label for="gender">Gender:</label>
+                        <input type="radio" id="male" name="gender" value="male">
+                        <label for="male">Male</label>
+                        <input type="radio" id="female" name="gender" value="female">
+                        <label for="female">Female</label><br><br>
+                
+                        <label for="phone">Phone:</label>
+                        <input type="text" id="phone" name="phone"><br><br>
+                
+                        <label for="email">Email:</label>
+                        <input type="text" id="email" name="email"><br><br>
+                
+                        <label for="problem">State your problem:</label>
+                        <input type="text" id="problem" name="problem"><br><br>
+                
+                        <input type="button" value="Submit" onclick="submitDetails()">
+                    </form>
+            
+                    <button class="btn btn-success" onclick="downloadPatientDetails()">Download Patient Details</button>
+                    <ul id="detailsList" class="list-unstyled"></ul>
+            
+                    <script>
+                        function updateTime() {
+                            var today = new Date();
+                            var date = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                            var time = today.toLocaleTimeString();
+                            document.getElementById("dateTime").innerHTML = date + " - " + time;
+                        }
+            
+                        updateTime();
+                        setInterval(updateTime, 1000);
+                        
+                        function validateName(name) {
+                        return /^[a-zA-Z\s]+$/.test(name);
+                    }
+            
+                    function validateAge(age) {
+                        return /^[0-9]+$/.test(age);
+                    }
+            
+                    function validatePhone(phone) {
+                        return /^\d{10}$/.test(phone);
+                    }
+            
+                    function validateEmail(email) {
+                        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+                    }
+            
+                    function submitDetails() {
+                        var name = document.getElementById("name").value.trim();
+                        var age = document.getElementById("age").value.trim();
+                        var gender = document.querySelector('input[name="gender"]:checked');
+                        var phone = document.getElementById("phone").value.trim();
+                        var email = document.getElementById("email").value.trim();
+                        var problem = document.getElementById("problem").value.trim();
+            
+                        if (!validateName(name)) {
+                            alert("Please enter a valid name (alphabets only).");
+                            return;
+                        }
+            
+                        if (!validateAge(age)) {
+                            alert("Please enter a valid age (numbers only).");
+                            return;
+                        }
+            
+                        if (gender === null) {
+                            alert("Please select a gender.");
+                            return;
+                        }
+            
+                        if (!validatePhone(phone)) {
+                            alert("Please enter a valid phone number (10 digits only).");
+                            return;
+                        }
+            
+                        if (!validateEmail(email)) {
+                            alert("Please enter a valid email address.");
+                            return;
+                        }
+            
+                        if (problem === "") {
+                            alert("Please state your problem.");
+                            return;
+                        }
+            
+                        var data = {
+                            name: name,
+                            age: age,
+                            gender: gender.value,
+                            phone: phone,
+                            email: email,
+                            problem: problem
+                        };
+            
+                        saveDetailsToFile(data);
+                    }
+            
+                    function saveDetailsToFile(data) {
+                        var localData = JSON.parse(localStorage.getItem('patientDetails')) || [];
+                        localData.push(data);
+                        localStorage.setItem('patientDetails', JSON.stringify(localData));
+                    }
+            
+                    function downloadPatientDetails() {
+                        var localData = JSON.parse(localStorage.getItem('patientDetails')) || [];
+                        var patientDetailsText = '';
+            
+                        localData.forEach(function (detail) {
+                            patientDetailsText += `Name: ${detail.name}, Age: ${detail.age}, Gender: ${detail.gender}, Phone: ${detail.phone}, Email: ${detail.email}, Problem: ${detail.problem}\n\n`;
+                        });
+            
+                        patientDetailsText += '\n\nForm Fields:\n';
+                        patientDetailsText += `Name: ${document.getElementById('name').value}\n`;
+                        patientDetailsText += `Age: ${document.getElementById('age').value}\n`;
+                        patientDetailsText += `Gender: ${document.querySelector('input[name="gender"]:checked').value}\n`;
+                        patientDetailsText += `Phone: ${document.getElementById('phone').value}\n`;
+                        patientDetailsText += `Email: ${document.getElementById('email').value}\n`;
+                        patientDetailsText += `Problem: ${document.getElementById('problem').value}\n`;
+            
+                        var blob = new Blob([patientDetailsText], { type: 'text/plain' });
+                        var fileName = 'patient_details.txt';
+            
+                        var a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = fileName;
+            
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+            
+                        URL.revokeObjectURL(a.href);
+                    }
+            
+                    function updateTime() {
+                        var today = new Date();
+                        var date = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                        var time = today.toLocaleTimeString();
+                        document.getElementById("dateTime").innerHTML = date + " - " + time;
+                    }
+            
+                    updateTime();
+                    setInterval(updateTime, 1000);
+                </script>
+                </div>
+            
+                <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+            </body>
+            </html>
+                <p>Appointment Form Goes Here</p>
+                </div>
+            </div>
+            
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add your script tags here -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Your login form processing logic goes here
+            
+            // Switch to the Messenger tab
+            document.getElementById('loginTab').classList.remove('active');
+            document.getElementById('appointmentTab').classList.remove('active');
+            document.getElementById('messengerTab').classList.add('active');
+
+            // Display the Messenger tab content
+            document.getElementById('login').classList.remove('show', 'active');
+            document.getElementById('appointment').classList.remove('show', 'active');
+            document.getElementById('messenger').classList.add('show', 'active');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+Name: chandru, Age: 20, Gender: male, Problem: headache, Email: bc464183@gmail.com
+Name: rahel, Age: 20, Gender: female, Problem: fever, Email: 1997rahel@gmail.com
+Name: suhaina, Age: 24, Gender: male, Problem: cough, Email: suhaina2802@gmail.com
+Name: suvetha, Age: 20, Gender: female, Problem: back pain, Email: 71762131053@cit.edu.in
+Name: sandy, Age: 20, Gender: male, Problem: sore throat, Email: 71762131047@gmail.com
+Name: sai, Age: 20, Gender: female, Problem: stomach ache, Email: 71762131041@cit.edu.in
+Name: aekshaan, Age: 19, Gender: male, Problem: fever, Email: 71762131052@cit.edu.in
+
+Name: Frank, Age: 35, Gender: male, Problem: flu, Email: suhaina2802@gmail.com
+Name: Grace, Age: 27, Gender: female, Problem: allergies, Email: suhaina2802@gmail.com
+Name: Harry, Age: 32, Gender: male, Problem: migraine, Email: suhaina2802@gmail.com
+Name: Irene, Age: 24, Gender: female, Problem: cough, Email: bubalan28@gmail.com
+Name: Jack, Age: 29, Gender: male, Problem: sinusitis, Email: bubalan28@gmail.com
